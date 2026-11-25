@@ -1,0 +1,3 @@
+# Ignorar credenciales locales privadas de Wi-Fi en cualquier ruta
+credenciales.h
+**/credenciales.h
