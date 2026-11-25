@@ -59,11 +59,3 @@ Compilado y verificado en **Arduino IDE 2.x / `arduino-cli`** para **`ESP32 Dev 
 2. **Apertura en Arduino IDE:** abra `Proyecto_Riego_Smart_UI_Web.ino` en la raíz; Arduino IDE compilará automáticamente de forma recursiva todos los módulos `.h` y `.cpp` dentro de `src/modulos/`. Seleccione **`ESP32 Dev Module`** y pulse **Subir**.
 3. **Conectividad local frente a Internet externo:** el control de riego y la supervisión local (pantalla TFT y Dashboard Web en `http://<IP_LOCAL_ESP32>/` desde `PROGMEM`) siguen funcionando sin conexión a Internet; únicamente la consulta meteorológica a `Open-Meteo` requiere conectividad externa, y se inhibe siempre que exista un ciclo de riego o pausa de infiltración en curso.
 4. **Seguridad honesta en red local:** los endpoints `POST` verifican subred privada `RFC 1918`, catálogo estricto de parámetros, compuerta única `puedeActivarBomba()` en `ControlRiego.cpp` y cabecera `X-Control-Local: ESP32` (mitigación básica contra *CSRF* accidental en LAN; al enviarse desde JavaScript es visible en el navegador y no equivale a autenticación criptográfica).
-
----
-
-## 5. Notas de Alineación con el Documento Académico (`Capítulo II`)
-
-1. **Tabla definitiva de pines (`Sección 2.8.2` y `Figura 2`):** utilizar la tabla de la sección 3 de este documento (`Configuracion.h`) en lugar del listado preliminar.
-2. **Protección `Dry-Run` acumulada (`20 s`) frente al límite continuo (`25 s`) (`Sección 2.6.5`):** `ControlRiego.cpp` diferencia `tiempoAcumuladoBombeoMs` (**`20 s` acumulados de bombeo activo entre pulsos**, sin reiniciarse en las pausas de `10 s` y exigiendo `+2%` de subida) frente a `tiempoContinuoBombaMs` (**`25 s` continuos ininterrumpidos**), reportando *Protección activada / sin subida de humedad* ya que no existe sensor físico de nivel en el depósito.
-3. **Precisión metrológica y compensación climática (`Secciones 2.3.1.4`, `2.3.2.3` y `2.6.1`):** el sensor capacitivo entrega un **índice relativo calibrado (`0–100%`)**; la validación del `DHT22` confirma una última lectura válida recibida (no calibración experimental frente a patrón); `Sensores.cpp` distingue compensación calculada y efectiva aplicada tras `constrain(20%, 75%)`; `VPD >= 1.6 kPa` ajusta el umbral (`+6%`) sin microaspersión; y `weather_code <= 1 && is_day == 1` representa **«Condiciones de cielo despejado durante el día (+3%)»**.
